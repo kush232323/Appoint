@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen, activeMenu, setActiveMenu, loggedInUser, setIsLoggedIn }) => {
+const Sidebar = ({ sidebarOpen, setSidebarOpen, activeMenu, setActiveMenu, loggedInUser, setIsLoggedIn, logo }) => {
   const styles = {
     sidebar: {
       width: sidebarOpen ? '260px' : '70px',
@@ -21,14 +21,24 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeMenu, setActiveMenu, logge
       alignItems: 'center',
       justifyContent: 'space-between'
     },
-    logo: {
-      fontSize: sidebarOpen ? '20px' : '0',
-      fontWeight: 'bold',
+    logoContainer: {
       display: 'flex',
       alignItems: 'center',
       gap: '10px',
       whiteSpace: 'nowrap',
       overflow: 'hidden'
+    },
+    logoImage: {
+      width: sidebarOpen ? '32px' : '0',
+      height: sidebarOpen ? '32px' : '0',
+      borderRadius: '8px',
+      objectFit: 'cover',
+      transition: 'all 0.3s ease'
+    },
+    logoText: {
+      fontSize: sidebarOpen ? '18px' : '0',
+      fontWeight: 'bold',
+      transition: 'all 0.3s ease'
     },
     toggleBtn: {
       background: 'none',
@@ -73,7 +83,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeMenu, setActiveMenu, logge
   return (
     <div style={styles.sidebar}>
       <div style={styles.sidebarHeader}>
-        <div style={styles.logo}>📅 {sidebarOpen && 'AppointPro'}</div>
+        <div style={styles.logoContainer}>
+          <img src={logo} alt="Logo" style={styles.logoImage} />
+          <span style={styles.logoText}>{sidebarOpen && 'AppointPro'}</span>
+        </div>
         <button style={styles.toggleBtn} onClick={() => setSidebarOpen(!sidebarOpen)}>
           {sidebarOpen ? '◀' : '▶'}
         </button>

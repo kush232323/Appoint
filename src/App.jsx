@@ -13,6 +13,7 @@ import AppointmentsListView from './components/AppointmentsListView';
 import PaymentsListView from './components/PaymentsListView';
 import ReportsView from './components/ReportsView';
 import SettingsView from './components/SettingsView';
+import logo from './assets/logo.jpg';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -250,11 +251,21 @@ const App = () => {
         setActiveMenu={setActiveMenu}
         loggedInUser={loggedInUser}
         setIsLoggedIn={setIsLoggedIn}
+        logo={logo}
       />
       
       <div style={{ ...styles.mainContent, marginLeft: sidebarOpen ? '260px' : '70px' }}>
-        <TopNavbar loggedInUser={loggedInUser} setIsLoggedIn={setIsLoggedIn} />
+        <TopNavbar loggedInUser={loggedInUser} setIsLoggedIn={setIsLoggedIn} logo={logo} />
         {renderMainContent()}
+        
+        {/* Footer with Powered By */}
+        <div style={styles.footer}>
+          <div style={styles.footerContent}>
+            <span>Powered by</span>
+            <img src={logo} alt="ADCSD" style={styles.footerLogo} />
+            <span style={styles.footerText}>ADCSD Appointment Pro</span>
+          </div>
+        </div>
       </div>
 
       <AddAppointmentModal 
@@ -292,12 +303,38 @@ const styles = {
     flex: 1,
     transition: 'all 0.3s ease',
     backgroundColor: '#f5f6f8',
-    overflowX: 'auto'
+    overflowX: 'auto',
+    display: 'flex',
+    flexDirection: 'column'
   },
   mainLayout: {
     display: 'flex',
     flex: 1,
     overflow: 'hidden'
+  },
+  footer: {
+    backgroundColor: 'white',
+    padding: '12px 20px',
+    borderTop: '1px solid #e5e7eb',
+    marginTop: 'auto'
+  },
+  footerContent: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    fontSize: '12px',
+    color: '#6b7280'
+  },
+  footerLogo: {
+    width: '20px',
+    height: '20px',
+    borderRadius: '4px',
+    objectFit: 'cover'
+  },
+  footerText: {
+    fontWeight: '500',
+    color: '#0f3460'
   }
 };
 
