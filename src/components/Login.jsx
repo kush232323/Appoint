@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import logo from '../assets/logo.jpg';
 
 const Login = ({ onLogin }) => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
@@ -32,44 +31,20 @@ const Login = ({ onLogin }) => {
       maxWidth: '90%'
     },
     loginHeader: { textAlign: 'center', marginBottom: '30px' },
-    logoImage: {
-      width: '60px',
-      height: '60px',
-      borderRadius: '12px',
-      marginBottom: '15px',
-      objectFit: 'cover'
-    },
     loginTitle: { fontSize: '28px', color: '#333', marginBottom: '10px' },
     inputGroup: { marginBottom: '20px' },
     inputLabel: { display: 'block', marginBottom: '8px', color: '#555', fontWeight: '500' },
     input: { width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px', fontSize: '14px' },
     loginButton: { width: '100%', padding: '12px', backgroundColor: '#667eea', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' },
     errorMsg: { backgroundColor: '#fee', color: '#c33', padding: '10px', borderRadius: '8px', marginBottom: '20px', fontSize: '14px', textAlign: 'center' },
-    demoInfo: { marginTop: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px', fontSize: '12px', textAlign: 'center', color: '#666' },
-    poweredBy: {
-      marginTop: '20px',
-      paddingTop: '15px',
-      borderTop: '1px solid #eee',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '8px',
-      fontSize: '11px',
-      color: '#999'
-    },
-    poweredLogo: {
-      width: '16px',
-      height: '16px',
-      borderRadius: '4px',
-      objectFit: 'cover'
-    }
+    demoInfo: { marginTop: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px', fontSize: '12px', textAlign: 'center', color: '#666' }
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.loginBox}>
         <div style={styles.loginHeader}>
-          <img src={logo} alt="AppointPro Logo" style={styles.logoImage} />
+          <div style={{ fontSize: '50px', marginBottom: '10px' }}>📅</div>
           <h1 style={styles.loginTitle}>AppointPro</h1>
           <p style={{ color: '#666', fontSize: '14px' }}>Appointment Management System</p>
         </div>
@@ -93,11 +68,6 @@ const Login = ({ onLogin }) => {
           <strong>Demo Credentials:</strong><br />
           Email: admin@example.com<br />
           Password: admin123
-        </div>
-        <div style={styles.poweredBy}>
-          <span>Powered by</span>
-          <img src={logo} alt="ADCSD" style={styles.poweredLogo} />
-          <span>ADCSD Appointment Pro</span>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen, activeMenu, setActiveMenu, loggedInUser, setIsLoggedIn, logo }) => {
+const Sidebar = ({ sidebarOpen, setSidebarOpen, activeMenu, setActiveMenu, loggedInUser, onLogout }) => {
   const styles = {
     sidebar: {
       width: sidebarOpen ? '260px' : '70px',
@@ -21,24 +21,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeMenu, setActiveMenu, logge
       alignItems: 'center',
       justifyContent: 'space-between'
     },
-    logoContainer: {
+    logo: {
+      fontSize: sidebarOpen ? '20px' : '0',
+      fontWeight: 'bold',
       display: 'flex',
       alignItems: 'center',
       gap: '10px',
       whiteSpace: 'nowrap',
       overflow: 'hidden'
-    },
-    logoImage: {
-      width: sidebarOpen ? '32px' : '0',
-      height: sidebarOpen ? '32px' : '0',
-      borderRadius: '8px',
-      objectFit: 'cover',
-      transition: 'all 0.3s ease'
-    },
-    logoText: {
-      fontSize: sidebarOpen ? '18px' : '0',
-      fontWeight: 'bold',
-      transition: 'all 0.3s ease'
     },
     toggleBtn: {
       background: 'none',
@@ -75,18 +65,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeMenu, setActiveMenu, logge
     { name: 'Dashboard', key: 'dashboard', icon: '📊' },
     { name: 'Calendar', key: 'calendar', icon: '📅' },
     { name: 'Appointments', key: 'appointments', icon: '📋' },
-    { name: 'Payments', key: 'payments', icon: '💰' },
-    { name: 'Reports', key: 'reports', icon: '📈' },
-    { name: 'Settings', key: 'settings', icon: '⚙️' }
+    { name: 'Doctors', key: 'doctors', icon: '👨‍⚕️' },
+    { name: 'Services', key: 'services', icon: '💆‍♀️' },
+    { name: 'Rooms', key: 'rooms', icon: '🚪' },
+    { name: 'Staff', key: 'staff', icon: '👥' },
+    { name: 'Patients', key: 'patients', icon: '🧑‍🤝‍🧑' }
   ];
 
   return (
     <div style={styles.sidebar}>
       <div style={styles.sidebarHeader}>
-        <div style={styles.logoContainer}>
-          <img src={logo} alt="Logo" style={styles.logoImage} />
-          <span style={styles.logoText}>{sidebarOpen && 'AppointPro'}</span>
-        </div>
+        <div style={styles.logo}>📅 {sidebarOpen && 'AppointPro'}</div>
         <button style={styles.toggleBtn} onClick={() => setSidebarOpen(!sidebarOpen)}>
           {sidebarOpen ? '◀' : '▶'}
         </button>
@@ -105,7 +94,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeMenu, setActiveMenu, logge
       </div>
       <div style={{ padding: '20px', borderTop: '1px solid #2d2d4e', fontSize: '12px', textAlign: 'center' }}>
         {sidebarOpen && `👤 ${loggedInUser?.name}`}
-        <button style={styles.logoutBtn} onClick={() => setIsLoggedIn(false)}>Logout</button>
+        <button style={styles.logoutBtn} onClick={onLogout}>Logout</button>
       </div>
     </div>
   );

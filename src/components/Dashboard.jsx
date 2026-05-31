@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DashboardView = ({ stats, appointments, patients }) => {
+const Dashboard = ({ stats, appointments, patients }) => {
   const todayAppointments = appointments?.filter(a => {
     const today = new Date().toISOString().split('T')[0];
     return a.appointment_date === today;
@@ -61,4 +61,4 @@ const DashboardView = ({ stats, appointments, patients }) => {
   );
 };
 
-export default DashboardView;
+export default Dashboard;
