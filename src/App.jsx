@@ -1,549 +1,1125 @@
-// App.jsx
 import React, { useState, useEffect } from 'react';
-import './App.css';
+import { 
+  Plus, Trash2, Edit, Save, X, Calendar, Building, Mail, 
+  CheckCircle, AlertCircle, Clock, Printer, Download, 
+  Eye, Users, Search, Zap, Shield, FileCheck, 
+  ClipboardList, CalendarCheck, RefreshCw, Send,
+  ChevronRight, ChevronDown, Folder, FileText, Menu, Home,
+  Settings, BarChart3, List, Layout, Grid, Layers, FileSpreadsheet,
+  File, FolderOpen, ChevronLeft, ChevronRight as ChevronRightIcon,
+  AlertTriangle, Info, CheckSquare, Square
+} from 'lucide-react';
 
-const App = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [showBookingAlert, setShowBookingAlert] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-  const [formSubmitted, setFormSubmitted] = useState(false);
+// Initial Data with hierarchy
+const initialTests = [
+  { id: 1, sno: '1.1', description: 'Earth Pit test', type: 'In-house', frequency: 'Half Yearly', category: 'Electrical', hasSubItems: true },
+  { id: 2, sno: '1.2', description: 'Thermal Overload Relay testing', type: 'In-house', frequency: 'Half Yearly', category: 'Electrical', hasSubItems: false },
+  { id: 3, sno: '1.3', description: 'Motor Megger test', type: 'In-house', frequency: 'Half Yearly', category: 'Electrical', hasSubItems: false },
+  { id: 4, sno: '1.4', description: 'Cable Insulation test', type: 'In-house', frequency: 'Half Yearly', category: 'Electrical', hasSubItems: false },
+  { id: 5, sno: '1.5', description: 'Protective Relay testing', type: 'Third Party', frequency: 'Yearly', category: 'Electrical', hasSubItems: false },
+  { id: 6, sno: '1.6', description: 'Transformer Oil testing as per IS-1866', type: 'Third Party', frequency: 'Yearly', category: 'Electrical', hasSubItems: false },
+  { id: 7, sno: '1.7', description: 'OLTC oil testing as per IS-1866', type: 'Third Party', frequency: 'Yearly', category: 'Electrical', hasSubItems: false },
+  { id: 8, sno: '1.8', description: 'DGA of Transformer oil', type: 'Third Party', frequency: 'Once in a three year', category: 'Electrical', hasSubItems: false },
+  { id: 9, sno: '1.9', description: 'Electrical Authorized personnel', type: 'In-house', frequency: 'Yearly', category: 'Electrical', hasSubItems: false },
+  { id: 10, sno: '1.10', description: 'Motor Push Button Continuity test', type: 'In-house', frequency: 'Yearly', category: 'Electrical', hasSubItems: false },
+  { id: 11, sno: '1.11', description: 'Earthing interlock test in carousel', type: 'In-house', frequency: 'Weekly', category: 'Electrical', hasSubItems: false },
+  { id: 12, sno: '1.12', description: 'Earthing interlock test in the Tank Truck gantry', type: 'In-house', frequency: 'Weekly', category: 'Electrical', hasSubItems: false },
+  { id: 13, sno: '1.13', description: 'Checking of interlock of the carousel and the manual filling machine and the vapour extraction Blower', type: 'In-house', frequency: 'Once a month', category: 'Electrical', hasSubItems: false },
+  { id: 14, sno: '1.14', description: 'Thermography of Panel', type: 'Third Party', frequency: 'Half Yearly', category: 'Electrical', hasSubItems: false },
+  { id: 15, sno: '1.15', description: 'Checking of VCB bottles for healthiness', type: 'Third Party', frequency: 'Once in a three year', category: 'Electrical', hasSubItems: false },
+  { id: 16, sno: '1.16', description: 'Insulating Mats checking', type: 'In-house', frequency: 'Once a year', category: 'Electrical', hasSubItems: false },
+  { id: 17, sno: '1.17', description: 'Condition of cable end sealing and terminal boxes', type: 'In-house', frequency: 'Once a year', category: 'Electrical', hasSubItems: false },
+  { id: 18, sno: '1.18', description: 'Lighting Illumination level (Lux Level) checking of various areas', type: 'In-house', frequency: 'Once a year', category: 'Electrical', hasSubItems: false },
+  { id: 19, sno: '1.19', description: 'Third harmonic current testing of the lightning arrestor', type: 'Third Party', frequency: 'Once in a three year', category: 'Electrical', hasSubItems: false },
+  { id: 20, sno: '1.20', description: 'Yearly check for sealing of the bus duct/cable entry on both sides of the wall', type: 'In-house', frequency: 'Once a year', category: 'Electrical', hasSubItems: false },
+  { id: 21, sno: '1.21', description: 'Checking of the electrical Insulation Block provided for the railway siding', type: 'In-house', frequency: 'Quarterly', category: 'Electrical', hasSubItems: false },
+  { id: 22, sno: '1.22', description: 'Continuity of earthing conductors', type: 'In-house', frequency: 'Once a year', category: 'Electrical', hasSubItems: false },
+  { id: 23, sno: '2.1', description: 'Fire Hose Testing', type: 'In-house', frequency: 'Yearly', category: 'Safety & Fire Fighting', hasSubItems: false },
+  { id: 24, sno: '2.2', description: 'Fire Hose quarterly check', type: 'In-house', frequency: 'Quarterly', category: 'Safety & Fire Fighting', hasSubItems: false },
+  { id: 25, sno: '2.3', description: 'Fire hose box checking', type: 'In-house', frequency: 'Quarterly', category: 'Safety & Fire Fighting', hasSubItems: false },
+  { id: 26, sno: '2.4', description: 'First Aid trained personnel', type: 'In-house', frequency: 'Yearly', category: 'Safety & Fire Fighting', hasSubItems: false },
+  { id: 27, sno: '2.5', description: 'DCP Extinguishers- All types-Visual Inspection', type: 'In-house', frequency: 'Monthly', category: 'Safety & Fire Fighting', hasSubItems: false },
+  { id: 28, sno: '2.6', description: 'Stored Pressure DCP Extinguisher', type: 'In-house', frequency: 'Quarterly', category: 'Safety & Fire Fighting', hasSubItems: false },
+  { id: 29, sno: '2.7', description: 'Cartridge Onarated DCP Extinguisher', type: 'In-house', frequency: 'Quarterly', category: 'Safety & Fire Fighting', hasSubItems: false },
+];
 
-  // Toggle Dark/Light Mode
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.body.classList.toggle('dark-mode');
-  };
+// Sub-items for Earth Pit test (1.1)
+const earthPitSubItems = [
+  { id: 'ep1', sno: '1.1.1', description: 'Body Earth Pit (BE-1)', location: 'Near Control Room' },
+  { id: 'ep2', sno: '1.1.2', description: 'Body Earth Pit (BE-2)', location: 'Near Compressor House' },
+  { id: 'ep3', sno: '1.1.3', description: 'Body Earth Pit (BE-3)', location: 'Near Tank Farm' },
+  { id: 'ep4', sno: '1.1.4', description: 'Neutral Earth Pit (NEP-1)', location: 'Near Substation' },
+  { id: 'ep5', sno: '1.1.5', description: 'Neutral Earth Pit (NEP-2)', location: 'Near DG Set' },
+  { id: 'ep6', sno: '1.1.6', description: 'Lightening Earth Pit (LEP-1)', location: 'Near Tower 1' },
+  { id: 'ep7', sno: '1.1.7', description: 'Lightening Earth Pit (LEP-2)', location: 'Near Tower 2' },
+  { id: 'ep8', sno: '1.1.8', description: 'Lightening Earth Pit (LEP-3)', location: 'Near Chimney' },
+];
 
-  // Handle Form Input Change
-  const handleFormChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+// Sample data for each test
+const testDataMap = {
+  '1.2': [
+    { id: 1, date: '2024-01-15', value: '0.05', status: 'Pass', remarks: 'OK' },
+    { id: 2, date: '2024-02-15', value: '0.04', status: 'Pass', remarks: 'OK' },
+  ],
+  '1.3': [
+    { id: 1, date: '2024-01-20', value: '50MΩ', status: 'Pass', remarks: 'OK' },
+    { id: 2, date: '2024-02-20', value: '48MΩ', status: 'Pass', remarks: 'OK' },
+  ],
+  '1.4': [
+    { id: 1, date: '2024-01-25', value: '100MΩ', status: 'Pass', remarks: 'OK' },
+  ],
+  '1.5': [
+    { id: 1, date: '2024-03-01', value: '98%', status: 'Pass', remarks: 'OK' },
+  ],
+  '1.6': [
+    { id: 1, date: '2024-03-15', value: '28kV', status: 'Pass', remarks: 'OK' },
+  ],
+};
 
-  // Handle Form Submit
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    if (formData.name && formData.email && formData.message) {
-      setFormSubmitted(true);
-      setTimeout(() => setFormSubmitted(false), 3000);
-      setFormData({ name: '', email: '', message: '' });
-    }
-  };
-
-  // Gallery Images - Category Wise
-  const galleryCategories = {
-    all: [
-      'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format',
-      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=800&auto=format',
-      'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format',
-      'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800&auto=format',
-      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=800&auto=format',
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format'
-    ],
-    rooms: [
-      'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format',
-      'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format',
-      'https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=800&auto=format'
-    ],
-    dining: [
-      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=800&auto=format',
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format'
-    ],
-    wellness: [
-      'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=800&auto=format',
-      'https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=800&auto=format'
-    ]
-  };
-
-  // Get current gallery images based on category
-  const getCurrentGalleryImages = () => {
-    return galleryCategories[activeCategory] || galleryCategories.all;
-  };
-
-  // Image URLs
-  const images = {
-    hero: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2000&auto=format',
-    heritage1: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format',
-    heritage2: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=1000&auto=format',
-    suite1: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1200&auto=format',
-    suite2: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200&auto=format',
-    suite3: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=1200&auto=format',
-    dining1: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1400&auto=format',
-    dining2: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1400&auto=format',
-    spa: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=900&auto=format',
-    pool: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=900&auto=format',
-    walk: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=900&auto=format',
-    celebration: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=900&auto=format',
-    cta: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=2000&auto=format',
-    modal: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=1200&auto=format',
-    award1: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png',
-    award2: 'https://cdn-icons-png.flaticon.com/512/2589/2589175.png',
-    award3: 'https://cdn-icons-png.flaticon.com/512/3159/3159321.png',
-    team1: 'https://randomuser.me/api/portraits/women/68.jpg',
-    team2: 'https://randomuser.me/api/portraits/men/32.jpg',
-    team3: 'https://randomuser.me/api/portraits/women/45.jpg',
-    team4: 'https://randomuser.me/api/portraits/men/75.jpg',
-    blog1: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=800&auto=format',
-    blog2: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format',
-    blog3: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=800&auto=format',
-    amenity1: 'https://cdn-icons-png.flaticon.com/512/1903/1903234.png',
-    amenity2: 'https://cdn-icons-png.flaticon.com/512/2645/2645895.png',
-    amenity3: 'https://cdn-icons-png.flaticon.com/512/1041/1041918.png',
-    amenity4: 'https://cdn-icons-png.flaticon.com/512/3106/3106774.png',
-    amenity5: 'https://cdn-icons-png.flaticon.com/512/2997/2997672.png',
-    amenity6: 'https://cdn-icons-png.flaticon.com/512/1061/1061026.png'
-  };
-
-  // Amenities Data
-  const amenities = [
-    { icon: images.amenity1, title: 'Free Wi-Fi', desc: 'High-speed internet throughout the property' },
-    { icon: images.amenity2, title: 'Spa & Wellness', desc: 'Full-service Ayurvedic spa' },
-    { icon: images.amenity3, title: 'Infinity Pool', desc: 'Heated pool with mountain views' },
-    { icon: images.amenity4, title: 'Fine Dining', desc: 'Multiple award-winning restaurants' },
-    { icon: images.amenity5, title: 'Butler Service', desc: '24/7 personalized service' },
-    { icon: images.amenity6, title: 'Fitness Center', desc: 'State-of-the-art gym equipment' }
-  ];
-
-  // Events Data
-  const events = [
-    { title: 'Wedding Packages', desc: 'Royal weddings with traditional ceremonies', price: 'Starting at ₹25L' },
-    { title: 'Corporate Events', desc: 'Conference rooms with modern amenities', price: 'Custom pricing' },
-    { title: 'Private Parties', desc: 'Exclusive celebrations in palace venues', price: 'On request' }
-  ];
-
-  // Offers Data
-  const offers = [
-    { title: 'Early Bird Special', discount: '25% OFF', desc: 'Book 30 days in advance', code: 'EARLY25' },
-    { title: 'Weekend Getaway', discount: '15% OFF', desc: 'Friday to Sunday stays', code: 'WEEKEND15' },
-    { title: 'Honeymoon Package', discount: '30% OFF', desc: 'Romantic getaway for couples', code: 'HONEY30' }
-  ];
-
-  // Blog Posts
-  const blogPosts = [
-    { title: 'A Royal Wedding at The Aravalli Palace', date: 'March 15, 2025', desc: 'Experience the grandeur of palace weddings with our exclusive wedding packages...' },
-    { title: 'The Art of Ayurvedic Wellness', date: 'March 10, 2025', desc: 'Discover our signature spa treatments inspired by ancient Indian traditions...' },
-    { title: 'Exploring the Aravalli Hills', date: 'March 5, 2025', desc: 'A guide to heritage walks and nature trails around the palace...' }
-  ];
-
-  // Handle scroll for sticky header
+// Toast Component
+const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 60);
-    };
-    window.addEventListener('scroll', handleScroll);
-    
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('in'), (i % 3) * 120);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15 });
-    
-    setTimeout(() => {
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    }, 100);
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      observer.disconnect();
-    };
-  }, []);
-
-  // Show welcome popup after 1.4 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => setModalOpen(true), 1400);
+    const timer = setTimeout(() => onClose(), 3000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [onClose]);
 
-  const closeModal = () => setModalOpen(false);
-  const handleBookingAlert = () => {
-    setShowBookingAlert(true);
-    setTimeout(() => setShowBookingAlert(false), 2000);
+  const colors = {
+    success: { bg: '#22c55e', icon: CheckCircle },
+    error: { bg: '#ef4444', icon: AlertCircle },
+    info: { bg: '#3b82f6', icon: AlertCircle }
   };
-
-  const handleSmoothScroll = (e, targetId) => {
-    e.preventDefault();
-    const element = document.querySelector(targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-    setMobileMenuOpen(false);
-  };
+  const color = colors[type] || colors.info;
+  const Icon = color.icon;
 
   return (
-    <div className="app">
-      {/* Header */}
-      <header className={`header ${scrolled ? 'scrolled' : ''}`}>
-        <div className="wrap nav">
-          <div className="logo">
-            The Aravalli <span>Palace</span>
-            <small>Gurugram · Est. 1924</small>
-          </div>
-          <ul className={`nav-links ${mobileMenuOpen ? 'open' : ''}`}>
-            <li><a href="#home" onClick={(e) => handleSmoothScroll(e, '#home')}>Home</a></li>
-            <li><a href="#heritage" onClick={(e) => handleSmoothScroll(e, '#heritage')}>Heritage</a></li>
-            <li><a href="#suites" onClick={(e) => handleSmoothScroll(e, '#suites')}>Suites</a></li>
-            <li><a href="#dining" onClick={(e) => handleSmoothScroll(e, '#dining')}>Dining</a></li>
-            <li><a href="#wellness" onClick={(e) => handleSmoothScroll(e, '#wellness')}>Wellness</a></li>
-            <li><a href="#gallery" onClick={(e) => handleSmoothScroll(e, '#gallery')}>Gallery</a></li>
-            <li><a href="#contact" onClick={(e) => handleSmoothScroll(e, '#contact')}>Contact</a></li>
-          </ul>
-          <div className="header-actions">
-            <button className="mode-toggle" onClick={toggleDarkMode} aria-label="Toggle Dark Mode">
-              {darkMode ? '☀️' : '🌙'}
-            </button>
-            <a href="#book" className="btn" onClick={(e) => handleSmoothScroll(e, '#book')}>Reserve</a>
-          </div>
-          <div className="burger" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            <span></span><span></span><span></span>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="hero" id="home">
-        <div className="hero-video">
-          <video autoPlay loop muted playsInline className="bg-video">
-            <source src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-yoga-pose-by-the-pool-32878-large.mp4" type="video/mp4" />
-          </video>
-        </div>
-        {images.hero && <img className="poster" src={images.hero} alt="Hero" />}
-        <div className="hero-inner">
-          <p className="eyebrow">A Legacy of Timeless Hospitality</p>
-          <h1>Where Royalty <em>Resides</em></h1>
-          <p>An exclusive heritage retreat nestled in the Aravalli hills — palatial suites, celebrated kitchens, and service worthy of kings.</p>
-          <div className="hero-btns">
-            <a href="#book" className="btn solid" onClick={(e) => handleSmoothScroll(e, '#book')}>Book Now</a>
-            <a href="#suites" className="btn" onClick={(e) => handleSmoothScroll(e, '#suites')}>Explore Suites</a>
-          </div>
-        </div>
-        <div className="scroll-cue"><span>Scroll</span><i></i></div>
-      </section>
-
-      {/* Booking Bar */}
-      <div className="booking" id="book">
-        <div className="field"><label>Arrival</label><input type="date" /></div>
-        <div className="field"><label>Departure</label><input type="date" /></div>
-        <div className="field"><label>Guests</label><select><option>1 Adult</option><option>2 Adults</option><option>2 Adults · 1 Child</option><option>Family Suite</option></select></div>
-        <a href="#" className="btn solid" onClick={(e) => { e.preventDefault(); handleBookingAlert(); }}>Check Availability</a>
-      </div>
-
-      {/* Heritage Section */}
-      <section id="heritage">
-        <div className="wrap heritage">
-          <div className="imgs reveal">
-            {images.heritage1 && <img src={images.heritage1} alt="Heritage" />}
-            {images.heritage2 && <img src={images.heritage2} alt="Courtyard" />}
-          </div>
-          <div className="reveal">
-            <p className="eyebrow">Our Story</p>
-            <h2>A century of grace, written in marble and gold</h2>
-            <p>Built as a maharaja's residence and lovingly restored, The Aravalli Palace blends the grandeur of a bygone era with the quiet comforts of modern luxury.</p>
-            <p>From hand-painted frescoes to gardens scented with jasmine, we have preserved the soul of the palace while reimagining it for the discerning traveller of today.</p>
-            <div className="sig">— The House of Aravalli</div>
-          </div>
-        </div>
-      </section>
-
-      {/* Amenities Section - NEW */}
-      <section className="amenities-section">
-        <div className="wrap">
-          <div className="section-head reveal">
-            <p className="eyebrow">Luxury Amenities</p>
-            <h2>World-Class Facilities</h2>
-            <div className="divider"></div>
-          </div>
-          <div className="amenities-grid">
-            {amenities.map((amenity, index) => (
-              <div key={index} className="amenity reveal">
-                <img src={amenity.icon} alt={amenity.title} />
-                <h3>{amenity.title}</h3>
-                <p>{amenity.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Suites Section */}
-      <section className="suites" id="suites">
-        <div className="wrap">
-          <div className="section-head reveal">
-            <p className="eyebrow">Accommodation</p>
-            <h2>Suites &amp; Residences</h2>
-            <div className="divider"></div>
-          </div>
-          <div className="suite-grid">
-            <div className="suite reveal">
-              <div className="ph">{images.suite1 && <img src={images.suite1} alt="Heritage Room" />}</div>
-              <div className="body"><div className="meta">Garden View · 55 sqm</div><h3>Heritage Room</h3><p>A graceful retreat overlooking the palace gardens.</p><div className="price">₹24,000 <small>/ night</small></div></div>
-            </div>
-            <div className="suite reveal">
-              <div className="ph">{images.suite2 && <img src={images.suite2} alt="Palace Suite" />}</div>
-              <div className="body"><div className="meta">Courtyard · 80 sqm</div><h3>Palace Suite</h3><p>A sprawling suite with a private living room.</p><div className="price">₹42,000 <small>/ night</small></div></div>
-            </div>
-            <div className="suite reveal">
-              <div className="ph">{images.suite3 && <img src={images.suite3} alt="Maharaja Suite" />}</div>
-              <div className="body"><div className="meta">Top Floor · 140 sqm</div><h3>Maharaja Suite</h3><p>Signature residence with private terrace.</p><div className="price">₹95,000 <small>/ night</small></div></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Dining Section */}
-      <section className="dining" id="dining">
-        <div className="wrap">
-          <div className="section-head reveal">
-            <p className="eyebrow">Culinary Journeys</p>
-            <h2>Dining</h2>
-            <div className="divider"></div>
-          </div>
-          <div className="dine-grid">
-            <div className="dine reveal">{images.dining1 && <img src={images.dining1} alt="The Durbar Hall" />}<div className="cap"><span>Signature · Indian</span><h3>The Durbar Hall</h3><p>Royal Awadhi cuisine under chandelier-lit dome.</p></div></div>
-            <div className="dine reveal">{images.dining2 && <img src={images.dining2} alt="The Conservatory" />}<div className="cap"><span>All Day · European</span><h3>The Conservatory</h3><p>Garden-side breakfasts and continental plates.</p></div></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Wellness Section */}
-      <section id="wellness">
-        <div className="wrap">
-          <div className="section-head reveal">
-            <p className="eyebrow">Curated Experiences</p>
-            <h2>Moments to Remember</h2>
-            <div className="divider"></div>
-          </div>
-          <div className="exp-grid">
-            <div className="exp reveal"><div className="ph">{images.spa && <img src={images.spa} alt="Spa" />}</div><h3>The Spa</h3><p>Ayurvedic rituals in private therapy suites.</p></div>
-            <div className="exp reveal"><div className="ph">{images.pool && <img src={images.pool} alt="Pool" />}</div><h3>Infinity Pool</h3><p>A heated pool overlooking the Aravalli ridge.</p></div>
-            <div className="exp reveal"><div className="ph">{images.walk && <img src={images.walk} alt="Heritage Walks" />}</div><h3>Heritage Walks</h3><p>Guided tours through the palace and its history.</p></div>
-            <div className="exp reveal"><div className="ph">{images.celebration && <img src={images.celebration} alt="Celebrations" />}</div><h3>Celebrations</h3><p>Regal weddings &amp; events in courtyard lawns.</p></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Gallery Section - Category Wise */}
-      <section className="gallery-section" id="gallery">
-        <div className="wrap">
-          <div className="section-head reveal">
-            <p className="eyebrow">Visual Journey</p>
-            <h2>Our Gallery</h2>
-            <div className="divider"></div>
-          </div>
-          <div className="gallery-categories">
-            <button className={activeCategory === 'all' ? 'active' : ''} onClick={() => setActiveCategory('all')}>All</button>
-            <button className={activeCategory === 'rooms' ? 'active' : ''} onClick={() => setActiveCategory('rooms')}>Rooms & Suites</button>
-            <button className={activeCategory === 'dining' ? 'active' : ''} onClick={() => setActiveCategory('dining')}>Dining</button>
-            <button className={activeCategory === 'wellness' ? 'active' : ''} onClick={() => setActiveCategory('wellness')}>Wellness</button>
-          </div>
-          <div className="gallery-grid">
-            {getCurrentGalleryImages().map((img, index) => (
-              <div key={index} className="gallery-item reveal">
-                <img src={img} alt={`Gallery ${index + 1}`} />
-                <div className="gallery-overlay"><span>View</span></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Offers Section - NEW */}
-      <section className="offers-section">
-        <div className="wrap">
-          <div className="section-head reveal">
-            <p className="eyebrow">Special Offers</p>
-            <h2>Exclusive Deals</h2>
-            <div className="divider"></div>
-          </div>
-          <div className="offers-grid">
-            {offers.map((offer, index) => (
-              <div key={index} className="offer-card reveal">
-                <div className="offer-discount">{offer.discount}</div>
-                <h3>{offer.title}</h3>
-                <p>{offer.desc}</p>
-                <div className="offer-code">Code: {offer.code}</div>
-                <a href="#book" className="btn" onClick={(e) => handleSmoothScroll(e, '#book')}>Book Now</a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Events Section - NEW */}
-      <section className="events-section">
-        <div className="wrap">
-          <div className="section-head reveal">
-            <p className="eyebrow">Celebrations</p>
-            <h2>Events & Weddings</h2>
-            <div className="divider"></div>
-          </div>
-          <div className="events-grid">
-            {events.map((event, index) => (
-              <div key={index} className="event-card reveal">
-                <h3>{event.title}</h3>
-                <p>{event.desc}</p>
-                <div className="event-price">{event.price}</div>
-                <a href="#contact" className="btn" onClick={(e) => handleSmoothScroll(e, '#contact')}>Inquire Now</a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Mode Section */}
-      <section className="mode-section">
-        <div className="wrap">
-          <div className="mode-content reveal">
-            <div className="mode-icon">{darkMode ? '🌙' : '☀️'}</div>
-            <h2>{darkMode ? 'Dark Mode Active' : 'Light Mode Active'}</h2>
-            <p>Experience the website in your preferred theme. Click the sun/moon icon in the header to switch between dark and light modes.</p>
-            <button className="btn solid" onClick={toggleDarkMode}>Switch to {darkMode ? 'Light' : 'Dark'} Mode</button>
-          </div>
-        </div>
-      </section>
-
-      {/* Awards Section */}
-      <section className="awards-section">
-        <div className="wrap">
-          <div className="section-head reveal">
-            <p className="eyebrow">Recognition</p>
-            <h2>Awards & Accolades</h2>
-            <div className="divider"></div>
-          </div>
-          <div className="awards-grid">
-            <div className="award reveal"><img src={images.award1} alt="Award" /><h4>World's Best Luxury Hotel</h4><p>2024</p></div>
-            <div className="award reveal"><img src={images.award2} alt="Award" /><h4>Best Heritage Property</h4><p>2023</p></div>
-            <div className="award reveal"><img src={images.award3} alt="Award" /><h4>Outstanding Service Award</h4><p>2024</p></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section className="team-section">
-        <div className="wrap">
-          <div className="section-head reveal">
-            <p className="eyebrow">Our People</p>
-            <h2>Leadership Team</h2>
-            <div className="divider"></div>
-          </div>
-          <div className="team-grid">
-            <div className="team reveal"><img src={images.team1} alt="Team" /><h4>Priya Singh</h4><p>General Manager</p></div>
-            <div className="team reveal"><img src={images.team2} alt="Team" /><h4>Arjun Mehta</h4><p>Executive Chef</p></div>
-            <div className="team reveal"><img src={images.team3} alt="Team" /><h4>Sarah Khan</h4><p>Director of Sales</p></div>
-            <div className="team reveal"><img src={images.team4} alt="Team" /><h4>Vikram Rathore</h4><p>Spa Director</p></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Blog Section */}
-      <section className="blog-section">
-        <div className="wrap">
-          <div className="section-head reveal">
-            <p className="eyebrow">Stories</p>
-            <h2>Latest from Our Blog</h2>
-            <div className="divider"></div>
-          </div>
-          <div className="blog-grid">
-            {blogPosts.map((post, index) => (
-              <div key={index} className="blog-card reveal">
-                <img src={images[`blog${index+1}`]} alt={post.title} />
-                <div className="blog-content">
-                  <span className="blog-date">{post.date}</span>
-                  <h3>{post.title}</h3>
-                  <p>{post.desc}</p>
-                  <a href="#" className="read-more">Read More →</a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Band */}
-      <section className="cta-band">
-        {images.cta && <img src={images.cta} alt="Palace view" />}
-        <div className="wrap">
-          <p className="eyebrow" style={{ color: 'var(--gold-light)' }}>An Invitation</p>
-          <h2>Your Palace Awaits</h2>
-          <p>Reserve your stay and let us craft an experience tailored to you, from arrival to farewell.</p>
-          <a href="#book" className="btn" onClick={(e) => handleSmoothScroll(e, '#book')}>Reserve Your Suite</a>
-        </div>
-      </section>
-
-      {/* Testimonial */}
-      <section>
-        <div className="wrap quote reveal">
-          <div className="stars">★ ★ ★ ★ ★</div>
-          <blockquote>"From the moment the gates opened, we were treated like royalty. The most exquisite stay of our lives."</blockquote>
-          <cite>— Featured in Condé Nast Traveller</cite>
-        </div>
-      </section>
-
-      {/* Contact Section - WORKING FORM */}
-      <section className="contact-section" id="contact">
-        <div className="wrap">
-          <div className="section-head reveal">
-            <p className="eyebrow">Get In Touch</p>
-            <h2>Contact Us</h2>
-            <div className="divider"></div>
-          </div>
-          <div className="contact-grid">
-            <div className="contact-info reveal">
-              <h3>Visit Us</h3>
-              <p>📍 Sector 00, Gurugram, Haryana, India</p>
-              <p>📞 +91 00000 00000</p>
-              <p>✉️ stay@aravallipalace.com</p>
-              <div className="contact-hours">
-                <h4>Reservation Hours</h4>
-                <p>Monday - Friday: 9:00 AM - 8:00 PM</p>
-                <p>Saturday - Sunday: 10:00 AM - 6:00 PM</p>
-              </div>
-            </div>
-            <div className="contact-form reveal">
-              <form onSubmit={handleFormSubmit}>
-                <input type="text" name="name" placeholder="Your Name" value={formData.name} onChange={handleFormChange} required />
-                <input type="email" name="email" placeholder="Your Email" value={formData.email} onChange={handleFormChange} required />
-                <textarea name="message" placeholder="Your Message" rows="5" value={formData.message} onChange={handleFormChange} required></textarea>
-                <button type="submit" className="btn solid">Send Message</button>
-                {formSubmitted && <div className="form-success">✓ Message sent successfully!</div>}
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer>
-        <div className="wrap">
-          <div className="foot-grid">
-            <div><div className="logo">The Aravalli <span style={{ color: 'var(--gold-light)' }}>Palace</span></div><p>A heritage luxury retreat in the Aravalli hills.</p></div>
-            <div><h4>Explore</h4><ul><li><a href="#heritage" onClick={(e) => handleSmoothScroll(e, '#heritage')}>Heritage</a></li><li><a href="#suites" onClick={(e) => handleSmoothScroll(e, '#suites')}>Suites</a></li><li><a href="#dining" onClick={(e) => handleSmoothScroll(e, '#dining')}>Dining</a></li><li><a href="#gallery" onClick={(e) => handleSmoothScroll(e, '#gallery')}>Gallery</a></li></ul></div>
-            <div><h4>Contact</h4><ul><li>Sector 00, Gurugram</li><li>+91 00000 00000</li><li>stay@aravallipalace.com</li></ul></div>
-            <div className="foot-news"><h4>Newsletter</h4><input type="email" placeholder="Your email address" /><a href="#" className="btn" style={{ color: 'var(--gold-light)', borderColor: 'var(--gold-light)' }} onClick={(e) => e.preventDefault()}>Subscribe</a></div>
-          </div>
-          <div className="foot-bottom"><span>© 2025 The Aravalli Palace. All rights reserved.</span><span>Privacy · Terms · Crafted for luxury</span></div>
-        </div>
-      </footer>
-
-      {/* Welcome Modal */}
-      {modalOpen && (<div className="modal-overlay show" onClick={closeModal}><div className="modal" onClick={(e) => e.stopPropagation()}><button className="close" onClick={closeModal}>&times;</button><div className="pic">{images.modal && <img src={images.modal} alt="Luxury suite" />}</div><div className="content"><p className="eyebrow">An Exclusive Invitation</p><h3>Welcome to the Palace</h3><p className="offer">Enjoy 20% off your first stay</p><p>Reserve direct and receive complimentary breakfast, a suite upgrade on arrival, and late checkout.</p><a href="#book" className="btn solid" onClick={(e) => { e.preventDefault(); closeModal(); handleSmoothScroll(e, '#book'); }}>Book Now</a><button className="later" onClick={closeModal}>Maybe later</button></div></div></div>)}
-
-      {/* Booking Alert */}
-      {showBookingAlert && (<div className="booking-alert">Connect this to your booking engine ↓</div>)}
+    <div style={{
+      position: 'fixed',
+      top: '20px',
+      right: '20px',
+      zIndex: 9999,
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      padding: '12px 20px',
+      borderRadius: '12px',
+      background: color.bg,
+      color: 'white',
+      fontWeight: '500',
+      boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+      animation: 'slideIn 0.3s ease-out'
+    }}>
+      <Icon size={20} />
+      <span>{message}</span>
+      <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', opacity: 0.8 }}>
+        <X size={18} />
+      </button>
     </div>
   );
 };
+
+// Main App
+function App() {
+  const [tests, setTests] = useState(() => {
+    const saved = localStorage.getItem('testRecords');
+    return saved ? JSON.parse(saved) : initialTests;
+  });
+
+  const [filteredTests, setFilteredTests] = useState(tests);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedType, setSelectedType] = useState('All');
+  const [selectedFrequency, setSelectedFrequency] = useState('All');
+  const [isEditing, setIsEditing] = useState(null);
+  const [editData, setEditData] = useState({ id: null, sno: '', description: '', type: '', frequency: '' });
+  const [isAdding, setIsAdding] = useState(false);
+  const [newTest, setNewTest] = useState({ sno: '', description: '', type: 'In-house', frequency: 'Half Yearly' });
+  const [toast, setToast] = useState(null);
+  const [selectedTest, setSelectedTest] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [emailData, setEmailData] = useState({ to: '', subject: 'Electrical Test Report', message: '' });
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  
+  // Sidebar states
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [expandedItems, setExpandedItems] = useState({ '1.1': true });
+  const [selectedMenuItem, setSelectedMenuItem] = useState('1.1');
+  
+  // Earth Pit Report states
+  const [showEarthPitReport, setShowEarthPitReport] = useState(false);
+  const [earthPitData, setEarthPitData] = useState(
+    earthPitSubItems.map(item => ({
+      ...item,
+      individualResistance: '',
+      gridResistance: '',
+      remarks: '',
+      testDate: '',
+      nextDueDate: ''
+    }))
+  );
+  const [testDate, setTestDate] = useState('');
+  const [nextDueDate, setNextDueDate] = useState('');
+
+  // Test data for selected menu item
+  const [testRecords, setTestRecords] = useState({});
+  const [newRecord, setNewRecord] = useState({ date: '', value: '', status: 'Pass', remarks: '' });
+  const [showAddRecord, setShowAddRecord] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('testRecords', JSON.stringify(tests));
+  }, [tests]);
+
+  useEffect(() => {
+    let filtered = tests;
+    if (searchTerm) {
+      filtered = filtered.filter(t => 
+        t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        t.sno.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    if (selectedType !== 'All') filtered = filtered.filter(t => t.type === selectedType);
+    if (selectedFrequency !== 'All') filtered = filtered.filter(t => t.frequency === selectedFrequency);
+    setFilteredTests(filtered);
+  }, [tests, searchTerm, selectedType, selectedFrequency]);
+
+  const showToast = (message, type = 'success') => setToast({ message, type });
+
+  const handleAddTest = () => {
+    if (!newTest.sno || !newTest.description) {
+      showToast('Please fill in S.No and Description', 'error');
+      return;
+    }
+    if (tests.some(t => t.sno === newTest.sno)) {
+      showToast('S.No already exists!', 'error');
+      return;
+    }
+    const testToAdd = { ...newTest, id: Date.now(), hasSubItems: false, category: 'Electrical' };
+    setTests([...tests, testToAdd]);
+    setNewTest({ sno: '', description: '', type: 'In-house', frequency: 'Half Yearly' });
+    setIsAdding(false);
+    showToast('Test added successfully!');
+  };
+
+  const handleSaveEdit = () => {
+    if (!editData.sno || !editData.description) {
+      showToast('Please fill in S.No and Description', 'error');
+      return;
+    }
+    setTests(tests.map(t => t.id === editData.id ? { ...editData } : t));
+    setIsEditing(null);
+    showToast('Test updated successfully!');
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this test?')) {
+      setTests(tests.filter(t => t.id !== id));
+      showToast('Test deleted successfully!');
+    }
+  };
+
+  const exportCSV = () => {
+    const headers = ['S.No', 'Description', 'Type', 'Frequency'];
+    const rows = tests.map(t => [t.sno, t.description, t.type, t.frequency]);
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `electrical_test_report_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('CSV exported successfully!');
+  };
+
+  const handleSendEmail = () => {
+    if (!emailData.to) {
+      showToast('Please enter recipient email', 'error');
+      return;
+    }
+    setIsSending(true);
+    
+    // Prepare email content with all test data
+    let emailContent = `${emailData.message}\n\n`;
+    emailContent += `Electrical Test Report\n`;
+    emailContent += `=====================\n\n`;
+    
+    if (selectedMenuItem === '1.1') {
+      emailContent += `EARTH PIT TEST REPORT\n`;
+      emailContent += `Test Date: ${testDate || 'Not set'}\n`;
+      emailContent += `Next Due Date: ${nextDueDate || 'Not set'}\n\n`;
+      emailContent += `S.No\tEarth Pit No\tLocation\tIndividual (Ω)\tGrid (Ω)\tRemarks\n`;
+      earthPitData.forEach(item => {
+        emailContent += `${item.sno}\t${item.description}\t${item.location}\t${item.individualResistance || '-'}\t${item.gridResistance || '-'}\t${item.remarks || '-'}\n`;
+      });
+    } else {
+      const records = testRecords[selectedMenuItem] || [];
+      if (records.length > 0) {
+        const test = tests.find(t => t.sno === selectedMenuItem);
+        emailContent += `${test?.description || selectedMenuItem} - Test Data\n`;
+        emailContent += `----------------------------------------\n`;
+        emailContent += `Date\tValue\tStatus\tRemarks\n`;
+        records.forEach(r => {
+          emailContent += `${r.date || '-'}\t${r.value || '-'}\t${r.status || '-'}\t${r.remarks || '-'}\n`;
+        });
+      } else {
+        emailContent += `No data available for ${selectedMenuItem}`;
+      }
+    }
+    
+    emailContent += `\n\nGenerated on: ${new Date().toLocaleString()}`;
+
+    setTimeout(() => {
+      setIsSending(false);
+      setShowEmailModal(false);
+      setEmailData({ to: '', subject: 'Electrical Test Report', message: '' });
+      showToast(`Email sent to ${emailData.to} successfully!`);
+      console.log('Email content:', emailContent);
+    }, 2000);
+  };
+
+  const handleEarthPitSave = () => {
+    const data = { testDate, nextDueDate, earthPitData };
+    setTestRecords(prev => ({ ...prev, '1.1': data }));
+    showToast('Earth Pit Report saved successfully!');
+    setShowEarthPitReport(false);
+  };
+
+  const handleEarthPitInputChange = (index, field, value) => {
+    const updated = [...earthPitData];
+    updated[index] = { ...updated[index], [field]: value };
+    setEarthPitData(updated);
+  };
+
+  const toggleExpand = (sno) => {
+    setExpandedItems(prev => ({ ...prev, [sno]: !prev[sno] }));
+  };
+
+  const handleMenuItemClick = (test) => {
+    setSelectedMenuItem(test.sno);
+    if (test.sno === '1.1') {
+      setShowEarthPitReport(true);
+      setShowModal(false);
+      setShowAddRecord(false);
+    } else {
+      setShowEarthPitReport(false);
+      // Load records for this test
+      if (!testRecords[test.sno]) {
+        // Initialize with sample data for demo
+        const sampleData = testDataMap[test.sno] || [];
+        setTestRecords(prev => ({ ...prev, [test.sno]: sampleData }));
+      }
+      setSelectedTest(test);
+      setShowModal(true);
+      setShowAddRecord(false);
+    }
+  };
+
+  const handleAddRecord = () => {
+    if (!newRecord.date || !newRecord.value) {
+      showToast('Please fill in Date and Value', 'error');
+      return;
+    }
+    const record = { ...newRecord, id: Date.now() };
+    setTestRecords(prev => ({
+      ...prev,
+      [selectedMenuItem]: [...(prev[selectedMenuItem] || []), record]
+    }));
+    setNewRecord({ date: '', value: '', status: 'Pass', remarks: '' });
+    setShowAddRecord(false);
+    showToast('Record added successfully!');
+  };
+
+  const handleDeleteRecord = (recordId) => {
+    if (window.confirm('Delete this record?')) {
+      setTestRecords(prev => ({
+        ...prev,
+        [selectedMenuItem]: prev[selectedMenuItem].filter(r => r.id !== recordId)
+      }));
+      showToast('Record deleted!');
+    }
+  };
+
+  const getFrequencyColor = (freq) => {
+    const colors = {
+      'Weekly': '#d1fae5', 'Monthly': '#dbeafe', 'Quarterly': '#fef9c3',
+      'Half Yearly': '#fed7aa', 'Yearly': '#fee2e2', 'Once in a three year': '#ede9fe',
+      'Once a month': '#dbeafe', 'Once a year': '#fee2e2'
+    };
+    return colors[freq] || '#f3f4f6';
+  };
+
+  const getFrequencyTextColor = (freq) => {
+    const colors = {
+      'Weekly': '#065f46', 'Monthly': '#1e40af', 'Quarterly': '#854d0e',
+      'Half Yearly': '#9a3412', 'Yearly': '#991b1b', 'Once in a three year': '#5b21b6',
+      'Once a month': '#1e40af', 'Once a year': '#991b1b'
+    };
+    return colors[freq] || '#4b5563';
+  };
+
+  // Group tests by category for sidebar
+  const groupedTests = tests.reduce((acc, test) => {
+    if (!acc[test.category]) acc[test.category] = [];
+    acc[test.category].push(test);
+    return acc;
+  }, {});
+
+  const stats = {
+    total: tests.length,
+    inHouse: tests.filter(t => t.type === 'In-house').length,
+    thirdParty: tests.filter(t => t.type === 'Third Party').length,
+    weekly: tests.filter(t => t.frequency === 'Weekly' || t.frequency === 'Once a month').length,
+    monthly: tests.filter(t => t.frequency === 'Monthly').length,
+    quarterly: tests.filter(t => t.frequency === 'Quarterly').length,
+    halfYearly: tests.filter(t => t.frequency === 'Half Yearly').length,
+    yearly: tests.filter(t => t.frequency === 'Yearly' || t.frequency === 'Once a year').length,
+    threeYear: tests.filter(t => t.frequency === 'Once in a three year').length,
+  };
+
+  // Get current test data for display
+  const currentRecords = testRecords[selectedMenuItem] || [];
+  const currentTest = tests.find(t => t.sno === selectedMenuItem);
+
+  // Styles
+  const styles = {
+    container: { minHeight: '100vh', background: '#f3f4f6', fontFamily: 'system-ui, -apple-system, sans-serif', display: 'flex' },
+    sidebar: {
+      width: sidebarOpen ? '320px' : '0px',
+      minHeight: '100vh',
+      background: 'linear-gradient(180deg, #1e1b4b, #312e81)',
+      color: 'white',
+      transition: 'width 0.3s ease',
+      overflow: 'hidden',
+      position: 'sticky',
+      top: 0,
+      height: '100vh',
+      zIndex: 20,
+      flexShrink: 0
+    },
+    sidebarContent: { 
+      padding: sidebarOpen ? '16px' : '0', 
+      opacity: sidebarOpen ? 1 : 0,
+      transition: 'opacity 0.2s ease',
+      overflowY: 'auto',
+      height: '100%'
+    },
+    sidebarHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)' },
+    sidebarTitle: { fontSize: '18px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' },
+    sidebarToggle: { 
+      background: 'rgba(255,255,255,0.1)', 
+      border: 'none', 
+      color: 'white', 
+      padding: '6px 10px', 
+      borderRadius: '8px', 
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '4px'
+    },
+    categoryHeader: { 
+      padding: '8px 12px', 
+      fontSize: '11px', 
+      textTransform: 'uppercase', 
+      color: '#a5b4fc', 
+      fontWeight: '600',
+      letterSpacing: '0.05em',
+      marginTop: '12px',
+      borderBottom: '1px solid rgba(255,255,255,0.05)'
+    },
+    menuItem: {
+      padding: '8px 12px',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      transition: 'all 0.15s ease',
+      fontSize: '14px',
+      marginBottom: '2px'
+    },
+    menuItemActive: {
+      background: 'rgba(99, 102, 241, 0.3)',
+      borderLeft: '3px solid #818cf8'
+    },
+    menuItemHover: {
+      background: 'rgba(255,255,255,0.05)'
+    },
+    subMenuItem: {
+      padding: '6px 12px 6px 40px',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      transition: 'all 0.15s ease',
+      fontSize: '13px',
+      color: '#c7d2fe',
+      marginBottom: '2px'
+    },
+    mainContent: {
+      flex: 1,
+      padding: '20px',
+      overflowX: 'hidden',
+      minWidth: 0
+    },
+    header: { background: 'linear-gradient(135deg, #4338ca, #1e1b4b)', color: 'white', padding: '12px 20px', position: 'sticky', top: 0, zIndex: 30, boxShadow: '0 4px 20px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+    headerInner: { display: 'flex', alignItems: 'center', gap: '16px', width: '100%' },
+    brand: { display: 'flex', alignItems: 'center', gap: '10px' },
+    brandTitle: { fontSize: '20px', fontWeight: 'bold' },
+    brandSub: { fontSize: '12px', color: '#a5b4fc' },
+    headerBadge: { background: 'rgba(255,255,255,0.15)', padding: '4px 12px', borderRadius: '9999px', fontSize: '14px' },
+    headerBtn: { background: 'white', color: '#4338ca', padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' },
+    statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px', marginBottom: '20px' },
+    statCard: { background: 'white', borderRadius: '12px', padding: '12px 16px', border: '1px solid #f3f4f6', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+    statLabel: { fontSize: '10px', textTransform: 'uppercase', color: '#6b7280', fontWeight: '600', letterSpacing: '0.05em' },
+    statValue: { fontSize: '24px', fontWeight: '700', color: '#1f2937', marginTop: '2px' },
+    statIcon: { padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+    searchBar: { background: 'white', borderRadius: '12px', padding: '16px', border: '1px solid #f3f4f6', marginBottom: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+    searchRow: { display: 'flex', flexDirection: 'column', gap: '12px' },
+    searchInput: { flex: 1, position: 'relative' },
+    input: { width: '100%', padding: '8px 12px 8px 40px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px', outline: 'none', background: '#f9fafb', transition: 'all 0.2s' },
+    filterGroup: { display: 'flex', gap: '8px', flexWrap: 'wrap' },
+    select: { padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px', background: 'white', outline: 'none', cursor: 'pointer' },
+    btnAdd: { background: '#4338ca', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '500' },
+    btnExport: { background: '#059669', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer' },
+    btnPrint: { background: '#4b5563', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer' },
+    tableWrap: { background: 'white', borderRadius: '12px', border: '1px solid #f3f4f6', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+    table: { width: '100%', borderCollapse: 'collapse' },
+    th: { padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', color: '#4b5563', background: '#f9fafb', borderBottom: '1px solid #e5e7eb' },
+    td: { padding: '12px 16px', fontSize: '14px', color: '#1f2937', borderBottom: '1px solid #f3f4f6' },
+    badge: { display: 'inline-block', padding: '4px 10px', fontSize: '11px', fontWeight: '500', borderRadius: '9999px' },
+    actionBtn: { padding: '6px', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'transparent', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' },
+    modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' },
+    modalContent: { background: 'white', borderRadius: '16px', maxWidth: '900px', width: '100%', maxHeight: '90vh', overflow: 'auto', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' },
+    modalHeader: { padding: '16px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: 'white', zIndex: 1 },
+    modalBody: { padding: '24px' },
+    modalFooter: { padding: '16px 24px', borderTop: '1px solid #f3f4f6', display: 'flex', justifyContent: 'flex-end', gap: '8px' },
+    footer: { marginTop: '24px', textAlign: 'center', fontSize: '14px', color: '#6b7280' },
+    reportHeader: { 
+      background: 'linear-gradient(135deg, #1e1b4b, #4338ca)', 
+      color: 'white', 
+      padding: '16px 24px',
+      borderRadius: '12px 12px 0 0',
+      marginBottom: '20px'
+    },
+    reportTable: { width: '100%', borderCollapse: 'collapse', border: '1px solid #e5e7eb' },
+    reportTh: { padding: '10px 12px', background: '#f9fafb', border: '1px solid #e5e7eb', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#4b5563' },
+    reportTd: { padding: '8px 12px', border: '1px solid #e5e7eb', fontSize: '13px' },
+    reportInput: { width: '100%', padding: '6px 8px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '13px', outline: 'none' }
+  };
+
+  // CSS Keyframes
+  const keyframes = `
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin { animation: spin 1s linear infinite; }
+    .animate-fade-in { animation: fadeIn 0.2s ease-out; }
+  `;
+
+  return (
+    <div style={styles.container}>
+      <style>{keyframes}</style>
+      
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+      {/* Sidebar */}
+      <div style={styles.sidebar}>
+        <div style={styles.sidebarContent}>
+          <div style={styles.sidebarHeader}>
+            <div style={styles.sidebarTitle}>
+              <Menu size={20} />
+              <span>Menu</span>
+            </div>
+            <button 
+              style={styles.sidebarToggle}
+              onClick={() => setSidebarOpen(false)}
+            >
+              <ChevronLeft size={18} />
+            </button>
+          </div>
+
+          {/* Dashboard */}
+          <div 
+            style={{ ...styles.menuItem, ...(selectedMenuItem === 'dashboard' ? styles.menuItemActive : {}) }}
+            onMouseEnter={(e) => { if (selectedMenuItem !== 'dashboard') e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+            onMouseLeave={(e) => { if (selectedMenuItem !== 'dashboard') e.currentTarget.style.background = 'transparent'; }}
+            onClick={() => { setSelectedMenuItem('dashboard'); setShowEarthPitReport(false); setShowModal(false); setShowAddRecord(false); }}
+          >
+            <Home size={18} />
+            <span>Dashboard</span>
+          </div>
+
+          {/* Test Categories */}
+          {Object.keys(groupedTests).map(category => (
+            <div key={category}>
+              <div style={styles.categoryHeader}>{category}</div>
+              {groupedTests[category].map(test => (
+                <div key={test.id}>
+                  <div 
+                    style={{ ...styles.menuItem, ...(selectedMenuItem === test.sno ? styles.menuItemActive : {}) }}
+                    onMouseEnter={(e) => { if (selectedMenuItem !== test.sno) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                    onMouseLeave={(e) => { if (selectedMenuItem !== test.sno) e.currentTarget.style.background = 'transparent'; }}
+                    onClick={() => {
+                      if (test.hasSubItems) {
+                        toggleExpand(test.sno);
+                      }
+                      handleMenuItemClick(test);
+                    }}
+                  >
+                    {test.hasSubItems ? (
+                      expandedItems[test.sno] ? <ChevronDown size={16} /> : <ChevronRight size={16} />
+                    ) : (
+                      <FileText size={16} />
+                    )}
+                    <span style={{ fontSize: '13px' }}>{test.sno} {test.description}</span>
+                  </div>
+                  
+                  {/* Sub-items for Earth Pit */}
+                  {test.hasSubItems && expandedItems[test.sno] && (
+                    <div>
+                      {earthPitSubItems.map(sub => (
+                        <div 
+                          key={sub.id}
+                          style={{ ...styles.subMenuItem, ...(selectedMenuItem === sub.sno ? { background: 'rgba(99,102,241,0.2)', borderLeft: '3px solid #818cf8' } : {}) }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                          onClick={() => {
+                            setSelectedMenuItem(sub.sno);
+                            setShowEarthPitReport(true);
+                            setShowModal(false);
+                            setShowAddRecord(false);
+                          }}
+                        >
+                          <File size={14} />
+                          <span style={{ fontSize: '12px' }}>{sub.sno} {sub.description}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+
+          {/* Reports */}
+          <div style={styles.categoryHeader}>Reports</div>
+          <div 
+            style={{ ...styles.menuItem, ...(selectedMenuItem === 'reports' ? styles.menuItemActive : {}) }}
+            onMouseEnter={(e) => { if (selectedMenuItem !== 'reports') e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+            onMouseLeave={(e) => { if (selectedMenuItem !== 'reports') e.currentTarget.style.background = 'transparent'; }}
+          >
+            <ClipboardList size={18} />
+            <span>All Reports</span>
+          </div>
+          <div 
+            style={{ ...styles.menuItem, ...(selectedMenuItem === 'settings' ? styles.menuItemActive : {}) }}
+            onMouseEnter={(e) => { if (selectedMenuItem !== 'settings') e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+            onMouseLeave={(e) => { if (selectedMenuItem !== 'settings') e.currentTarget.style.background = 'transparent'; }}
+          >
+            <Settings size={18} />
+            <span>Settings</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div style={styles.mainContent}>
+        {/* Header */}
+        <div style={styles.header}>
+          <div style={styles.headerInner}>
+            {!sidebarOpen && (
+              <button 
+                onClick={() => setSidebarOpen(true)}
+                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '6px 10px', borderRadius: '8px', cursor: 'pointer' }}
+              >
+                <Menu size={20} />
+              </button>
+            )}
+            <div style={styles.brand}>
+              <Zap size={28} color="#a78bfa" />
+              <div>
+                <div style={styles.brandTitle}>Electrical Test Management</div>
+                <div style={styles.brandSub}>IOCL LPG Bottling Plant</div>
+              </div>
+            </div>
+            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={styles.headerBadge}>{tests.length} Tests</span>
+              <button style={styles.headerBtn} onClick={() => setShowEmailModal(true)}>
+                <Mail size={16} /> Email Report
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Dashboard View */}
+        {selectedMenuItem === 'dashboard' && (
+          <>
+            {/* Stats */}
+            <div style={styles.statsGrid}>
+              {[
+                { label: 'Total', value: stats.total, color: '#6366f1', icon: FileCheck },
+                { label: 'In-house', value: stats.inHouse, color: '#6366f1', icon: Users },
+                { label: 'Third Party', value: stats.thirdParty, color: '#d97706', icon: Building },
+                { label: 'Weekly/Monthly', value: stats.weekly + stats.monthly, color: '#2563eb', icon: Clock },
+                { label: 'Quarterly', value: stats.quarterly, color: '#ca8a04', icon: Calendar },
+                { label: 'Yearly', value: stats.yearly, color: '#dc2626', icon: CalendarCheck },
+                { label: '3 Year', value: stats.threeYear, color: '#7c3aed', icon: Shield },
+              ].map((s, i) => (
+                <div key={i} style={styles.statCard}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={styles.statLabel}>{s.label}</div>
+                      <div style={{ ...styles.statValue, color: s.color }}>{s.value}</div>
+                    </div>
+                    <div style={{ ...styles.statIcon, background: `${s.color}20`, color: s.color }}><s.icon size={18} /></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Search & Filters */}
+            <div style={styles.searchBar}>
+              <div style={styles.searchRow}>
+                <div style={styles.searchInput}>
+                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+                  <input
+                    type="text"
+                    placeholder="Search by S.No or Description..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={styles.input}
+                    onFocus={(e) => e.target.style.cssText = Object.entries({ ...styles.input, borderColor: '#6366f1', boxShadow: '0 0 0 3px rgba(99,102,241,0.15)', background: 'white' }).map(([k,v]) => `${k}:${v}`).join(';')}
+                    onBlur={(e) => e.target.style.cssText = Object.entries(styles.input).map(([k,v]) => `${k}:${v}`).join(';')}
+                  />
+                </div>
+                <div style={styles.filterGroup}>
+                  <select style={styles.select} value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
+                    <option value="All">All Types</option>
+                    <option value="In-house">In-house</option>
+                    <option value="Third Party">Third Party</option>
+                  </select>
+                  <select style={styles.select} value={selectedFrequency} onChange={(e) => setSelectedFrequency(e.target.value)}>
+                    <option value="All">All Frequencies</option>
+                    <option value="Weekly">Weekly</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Quarterly">Quarterly</option>
+                    <option value="Half Yearly">Half Yearly</option>
+                    <option value="Yearly">Yearly</option>
+                    <option value="Once in a three year">Once in 3 Year</option>
+                    <option value="Once a month">Once a month</option>
+                    <option value="Once a year">Once a year</option>
+                  </select>
+                  <button style={styles.btnAdd} onClick={() => setIsAdding(true)}><Plus size={16} /> Add</button>
+                  <button style={styles.btnExport} onClick={exportCSV}><Download size={16} /></button>
+                  <button style={styles.btnPrint} onClick={() => window.print()}><Printer size={16} /></button>
+                </div>
+              </div>
+            </div>
+
+            {/* Add Form */}
+            {isAdding && (
+              <div style={{ ...styles.searchBar, animation: 'fadeIn 0.2s ease-out' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <h3 style={{ fontWeight: '600', color: '#1f2937' }}>Add New Test</h3>
+                  <button onClick={() => setIsAdding(false)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer' }}><X size={20} /></button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                  <input type="text" placeholder="S.No (e.g. 1.23)" value={newTest.sno} onChange={(e) => setNewTest({...newTest, sno: e.target.value})} style={styles.input} />
+                  <input type="text" placeholder="Description" value={newTest.description} onChange={(e) => setNewTest({...newTest, description: e.target.value})} style={styles.input} />
+                  <select style={styles.select} value={newTest.type} onChange={(e) => setNewTest({...newTest, type: e.target.value})}>
+                    <option value="In-house">In-house</option>
+                    <option value="Third Party">Third Party</option>
+                  </select>
+                  <select style={styles.select} value={newTest.frequency} onChange={(e) => setNewTest({...newTest, frequency: e.target.value})}>
+                    <option value="Weekly">Weekly</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Quarterly">Quarterly</option>
+                    <option value="Half Yearly">Half Yearly</option>
+                    <option value="Yearly">Yearly</option>
+                    <option value="Once in a three year">Once in 3 Year</option>
+                    <option value="Once a month">Once a month</option>
+                    <option value="Once a year">Once a year</option>
+                  </select>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
+                  <button onClick={() => setIsAdding(false)} style={{ padding: '8px 16px', border: '1px solid #e5e7eb', borderRadius: '8px', background: 'white', cursor: 'pointer' }}>Cancel</button>
+                  <button onClick={handleAddTest} style={{ padding: '8px 16px', border: 'none', borderRadius: '8px', background: '#4338ca', color: 'white', cursor: 'pointer', fontWeight: '500' }}>Add Test</button>
+                </div>
+              </div>
+            )}
+
+            {/* Table */}
+            <div style={styles.tableWrap}>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={styles.table}>
+                  <thead>
+                    <tr>
+                      <th style={styles.th}>S.No</th>
+                      <th style={styles.th}>Description</th>
+                      <th style={styles.th}>Type</th>
+                      <th style={styles.th}>Frequency</th>
+                      <th style={{ ...styles.th, textAlign: 'right' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredTests.length === 0 ? (
+                      <tr><td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>No tests found</td></tr>
+                    ) : (
+                      filteredTests.map((test) => (
+                        <tr key={test.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                          <td style={styles.td}><strong>{test.sno}</strong></td>
+                          <td style={styles.td}>{test.description}</td>
+                          <td style={styles.td}>
+                            <span style={{ ...styles.badge, background: test.type === 'In-house' ? '#eef2ff' : '#fef3c7', color: test.type === 'In-house' ? '#4338ca' : '#d97706' }}>{test.type}</span>
+                          </td>
+                          <td style={styles.td}>
+                            <span style={{ ...styles.badge, background: getFrequencyColor(test.frequency), color: getFrequencyTextColor(test.frequency) }}>{test.frequency}</span>
+                          </td>
+                          <td style={{ ...styles.td, textAlign: 'right' }}>
+                            {isEditing === test.id ? (
+                              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '4px' }}>
+                                <button onClick={handleSaveEdit} style={{ ...styles.actionBtn, color: '#22c55e' }}><Check size={16} /></button>
+                                <button onClick={() => { setIsEditing(null); setEditData({ id: null, sno: '', description: '', type: '', frequency: '' }); }} style={{ ...styles.actionBtn, color: '#6b7280' }}><X size={16} /></button>
+                              </div>
+                            ) : (
+                              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '4px' }}>
+                                <button onClick={() => { 
+                                  if (test.sno === '1.1') {
+                                    setShowEarthPitReport(true);
+                                    setShowModal(false);
+                                    setShowAddRecord(false);
+                                  } else {
+                                    handleMenuItemClick(test);
+                                  }
+                                }} style={{ ...styles.actionBtn, color: '#3b82f6' }}><Eye size={16} /></button>
+                                <button onClick={() => { setIsEditing(test.id); setEditData({...test}); }} style={{ ...styles.actionBtn, color: '#6366f1' }}><Edit size={16} /></button>
+                                <button onClick={() => handleDelete(test.id)} style={{ ...styles.actionBtn, color: '#ef4444' }}><Trash2 size={16} /></button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div style={styles.footer}>
+              <p>Total: {filteredTests.length} tests | Last updated: {new Date().toLocaleString()}</p>
+              <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>IOCL LPG Bottling Plant - Electrical Test Management System</p>
+            </div>
+          </>
+        )}
+
+        {/* Earth Pit Report */}
+        {selectedMenuItem === '1.1' && showEarthPitReport && (
+          <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
+            <div style={styles.reportHeader}>
+              <h2 style={{ margin: 0, fontSize: '20px' }}>Test Report For Earth Pits</h2>
+              <p style={{ margin: '4px 0 0', opacity: 0.8, fontSize: '14px' }}>
+                INDIAN OIL CORPORATION LIMITED - LPG BOTTLING PLANT
+              </p>
+            </div>
+
+            <div style={{ background: 'white', borderRadius: '12px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', marginBottom: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Test Date</label>
+                  <input type="date" style={styles.input} value={testDate} onChange={(e) => setTestDate(e.target.value)} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Next Due Date</label>
+                  <input type="date" style={styles.input} value={nextDueDate} onChange={(e) => setNextDueDate(e.target.value)} />
+                </div>
+              </div>
+
+              <div style={{ overflowX: 'auto' }}>
+                <table style={styles.reportTable}>
+                  <thead>
+                    <tr>
+                      <th style={styles.reportTh}>S/No.</th>
+                      <th style={styles.reportTh}>Earth Pit No</th>
+                      <th style={styles.reportTh}>Location</th>
+                      <th style={styles.reportTh}>Individual Pit (Ω)</th>
+                      <th style={styles.reportTh}>Grid (Ω)</th>
+                      <th style={styles.reportTh}>Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {earthPitData.map((item, index) => (
+                      <tr key={item.id}>
+                        <td style={styles.reportTd}>{index + 1}</td>
+                        <td style={styles.reportTd}><strong>{item.sno}</strong></td>
+                        <td style={styles.reportTd}>{item.location}</td>
+                        <td style={styles.reportTd}>
+                          <input 
+                            type="text" 
+                            style={styles.reportInput} 
+                            placeholder="Ω"
+                            value={item.individualResistance}
+                            onChange={(e) => handleEarthPitInputChange(index, 'individualResistance', e.target.value)}
+                          />
+                        </td>
+                        <td style={styles.reportTd}>
+                          <input 
+                            type="text" 
+                            style={styles.reportInput} 
+                            placeholder="Ω"
+                            value={item.gridResistance}
+                            onChange={(e) => handleEarthPitInputChange(index, 'gridResistance', e.target.value)}
+                          />
+                        </td>
+                        <td style={styles.reportTd}>
+                          <input 
+                            type="text" 
+                            style={styles.reportInput} 
+                            placeholder="Remarks"
+                            value={item.remarks}
+                            onChange={(e) => handleEarthPitInputChange(index, 'remarks', e.target.value)}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ marginTop: '16px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '2px' }}>Testing Agency</label>
+                  <input type="text" style={{ ...styles.input, padding: '6px 10px' }} placeholder="Agency Name" />
+                </div>
+                <div style={{ flex: 1, minWidth: '150px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '2px' }}>License No</label>
+                  <input type="text" style={{ ...styles.input, padding: '6px 10px' }} placeholder="License" />
+                </div>
+                <div style={{ flex: 1, minWidth: '150px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '2px' }}>Lic. Validity</label>
+                  <input type="date" style={{ ...styles.input, padding: '6px 10px' }} />
+                </div>
+              </div>
+
+              <div style={{ marginTop: '16px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '2px' }}>IOCL Representative</label>
+                  <input type="text" style={{ ...styles.input, padding: '6px 10px' }} placeholder="Name & Designation" />
+                </div>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '2px' }}>Seal & Signature</label>
+                  <input type="text" style={{ ...styles.input, padding: '6px 10px' }} placeholder="Signature" />
+                </div>
+              </div>
+
+              <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button 
+                  onClick={() => { setShowEarthPitReport(false); setSelectedMenuItem('dashboard'); }}
+                  style={{ padding: '10px 24px', border: '1px solid #e5e7eb', borderRadius: '8px', background: 'white', cursor: 'pointer' }}
+                >
+                  Close
+                </button>
+                <button 
+                  onClick={handleEarthPitSave}
+                  style={{ padding: '10px 24px', border: 'none', borderRadius: '8px', background: '#4338ca', color: 'white', cursor: 'pointer' }}
+                >
+                  Save Report
+                </button>
+                <button 
+                  onClick={() => window.print()}
+                  style={{ padding: '10px 24px', border: 'none', borderRadius: '8px', background: '#4b5563', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Printer size={16} /> Print
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Test Detail View for other tests */}
+        {selectedMenuItem !== 'dashboard' && selectedMenuItem !== '1.1' && showModal && (
+          <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
+            <div style={{ ...styles.reportHeader, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '20px' }}>{currentTest?.sno} - {currentTest?.description}</h2>
+                <p style={{ margin: '4px 0 0', opacity: 0.8, fontSize: '14px' }}>
+                  Type: {currentTest?.type} | Frequency: {currentTest?.frequency}
+                </p>
+              </div>
+              <button 
+                onClick={() => { setShowModal(false); setSelectedMenuItem('dashboard'); }}
+                style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer' }}
+              >
+                <X size={18} /> Close
+              </button>
+            </div>
+
+            <div style={{ background: 'white', borderRadius: '12px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h3 style={{ margin: 0, fontWeight: '600', color: '#1f2937' }}>Test Records</h3>
+                <button 
+                  onClick={() => setShowAddRecord(!showAddRecord)}
+                  style={{ ...styles.btnAdd, padding: '6px 14px', fontSize: '13px' }}
+                >
+                  <Plus size={16} /> Add Record
+                </button>
+              </div>
+
+              {/* Add Record Form */}
+              {showAddRecord && (
+                <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px', marginBottom: '16px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: '500', color: '#374151' }}>Date</label>
+                      <input type="date" style={styles.input} value={newRecord.date} onChange={(e) => setNewRecord({...newRecord, date: e.target.value})} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: '500', color: '#374151' }}>Value</label>
+                      <input type="text" style={styles.input} placeholder="Value" value={newRecord.value} onChange={(e) => setNewRecord({...newRecord, value: e.target.value})} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: '500', color: '#374151' }}>Status</label>
+                      <select style={styles.select} value={newRecord.status} onChange={(e) => setNewRecord({...newRecord, status: e.target.value})}>
+                        <option value="Pass">Pass</option>
+                        <option value="Fail">Fail</option>
+                        <option value="Pending">Pending</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: '500', color: '#374151' }}>Remarks</label>
+                      <input type="text" style={styles.input} placeholder="Remarks" value={newRecord.remarks} onChange={(e) => setNewRecord({...newRecord, remarks: e.target.value})} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
+                    <button onClick={() => setShowAddRecord(false)} style={{ padding: '6px 16px', border: '1px solid #e5e7eb', borderRadius: '6px', background: 'white', cursor: 'pointer' }}>Cancel</button>
+                    <button onClick={handleAddRecord} style={{ padding: '6px 16px', border: 'none', borderRadius: '6px', background: '#4338ca', color: 'white', cursor: 'pointer' }}>Add</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Records Table */}
+              {currentRecords.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+                  <FileText size={48} style={{ margin: '0 auto 12px', color: '#d1d5db' }} />
+                  <p>No records found. Click "Add Record" to add data.</p>
+                </div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={styles.reportTable}>
+                    <thead>
+                      <tr>
+                        <th style={styles.reportTh}>#</th>
+                        <th style={styles.reportTh}>Date</th>
+                        <th style={styles.reportTh}>Value</th>
+                        <th style={styles.reportTh}>Status</th>
+                        <th style={styles.reportTh}>Remarks</th>
+                        <th style={{ ...styles.reportTh, textAlign: 'center' }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentRecords.map((record, index) => (
+                        <tr key={record.id}>
+                          <td style={styles.reportTd}>{index + 1}</td>
+                          <td style={styles.reportTd}>{record.date || '-'}</td>
+                          <td style={styles.reportTd}><strong>{record.value || '-'}</strong></td>
+                          <td style={styles.reportTd}>
+                            <span style={{ 
+                              ...styles.badge, 
+                              background: record.status === 'Pass' ? '#d1fae5' : record.status === 'Fail' ? '#fee2e2' : '#fef9c3',
+                              color: record.status === 'Pass' ? '#065f46' : record.status === 'Fail' ? '#991b1b' : '#854d0e'
+                            }}>
+                              {record.status || '-'}
+                            </span>
+                          </td>
+                          <td style={styles.reportTd}>{record.remarks || '-'}</td>
+                          <td style={{ ...styles.reportTd, textAlign: 'center' }}>
+                            <button 
+                              onClick={() => handleDeleteRecord(record.id)}
+                              style={{ ...styles.actionBtn, color: '#ef4444' }}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button 
+                  onClick={exportCSV}
+                  style={{ padding: '8px 20px', border: 'none', borderRadius: '8px', background: '#059669', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Download size={16} /> Export CSV
+                </button>
+                <button 
+                  onClick={() => window.print()}
+                  style={{ padding: '8px 20px', border: 'none', borderRadius: '8px', background: '#4b5563', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Printer size={16} /> Print
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Email Modal */}
+      {showEmailModal && (
+        <div style={styles.modalOverlay} onClick={() => setShowEmailModal(false)}>
+          <div style={{ ...styles.modalContent, maxWidth: '480px', animation: 'fadeIn 0.2s ease-out' }} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h3 style={{ fontWeight: '600', color: '#1f2937', display: 'flex', alignItems: 'center', gap: '8px' }}><Mail size={20} color="#6366f1" /> Send Email Report</h3>
+              <button onClick={() => setShowEmailModal(false)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer' }}><X size={24} /></button>
+            </div>
+            <div style={styles.modalBody}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>To Email</label>
+                <input type="email" placeholder="recipient@example.com" value={emailData.to} onChange={(e) => setEmailData({...emailData, to: e.target.value})} style={{ ...styles.input, width: '100%' }} />
+              </div>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Subject</label>
+                <input type="text" placeholder="Email Subject" value={emailData.subject} onChange={(e) => setEmailData({...emailData, subject: e.target.value})} style={{ ...styles.input, width: '100%' }} />
+              </div>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Message</label>
+                <textarea rows="3" placeholder="Add a message..." value={emailData.message} onChange={(e) => setEmailData({...emailData, message: e.target.value})} style={{ ...styles.input, width: '100%', resize: 'none' }} />
+              </div>
+              <div style={{ background: '#f9fafb', padding: '12px', borderRadius: '8px', fontSize: '14px', color: '#4b5563' }}>
+                <strong>Summary:</strong> Total Tests: {tests.length} | In-house: {stats.inHouse} | Third Party: {stats.thirdParty}
+                {selectedMenuItem !== 'dashboard' && selectedMenuItem !== '1.1' && (
+                  <div style={{ marginTop: '4px', fontSize: '13px' }}>
+                    Selected: {currentTest?.sno} - {currentTest?.description} ({currentRecords.length} records)
+                  </div>
+                )}
+                {selectedMenuItem === '1.1' && (
+                  <div style={{ marginTop: '4px', fontSize: '13px' }}>
+                    Earth Pit Report ({earthPitData.length} pits)
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{ ...styles.modalFooter, gap: '8px' }}>
+              <button onClick={() => setShowEmailModal(false)} style={{ padding: '8px 16px', border: '1px solid #e5e7eb', borderRadius: '8px', background: 'white', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={handleSendEmail} disabled={isSending} style={{ padding: '8px 24px', border: 'none', borderRadius: '8px', background: '#4338ca', color: 'white', cursor: isSending ? 'not-allowed' : 'pointer', opacity: isSending ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {isSending ? <><RefreshCw size={16} className="animate-spin" /> Sending...</> : <><Send size={16} /> Send</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default App;
